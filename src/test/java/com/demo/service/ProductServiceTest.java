@@ -3,49 +3,63 @@ package com.demo.service;
 
 import com.demo.bean.Product;
 import com.demo.bean.RequestParamsDef;
-import com.demo.mockito.MockitoExtension;
-import org.junit.jupiter.api.BeforeAll;
+import com.demo.dao.ProductDao;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.junit.MockitoJUnit;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.List;
+
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+//For JUnit 5 tests you can silent this exception using annotation provided in mockito-junit-jupiter package.
+//@MockitoSettings(strictness = Strictness.LENIENT)
 class ProductServiceTest {
 
     @InjectMocks
     ProductService productService;
 
+    @Mock
+    ProductDao productDao;
 
     @Test
     @DisplayName("Check Request Prams are empty or null")
-    void emptyOrNullCheckForProductRequestParams(){
+    public void emptyOrNullCheckForProductRequestParams(){
+        Product product = mock(Product.class);
+        product.setName("iphone");
+        product.setDescription("iphone 10");
+
         RequestParamsDef requestParams = new RequestParamsDef();
         requestParams.setKeywords("Prod1");
-        assertNotNull(productService.getProdctsByKeyword(requestParams),"Keyword should not be empty or null");
+
+        final Optional<Product> resultProducts = productService.getProdctsByKeyword(requestParams);
+       assertThat(productService.getProdctsByKeyword(requestParams),is(notNullValue()));
+       //assertThat(productService.getProdctsByKeyword(requestParams).get().getName(),is(equalToIgnoringWhiteSpace("iphone")));
     }
     @Test
     void getProductsByKeyword() {
         RequestParamsDef requestParams = new RequestParamsDef();
         requestParams.setKeywords("Prod1");
-        Product product = new Product();
-        product.setName("Prod1");
         final Optional<Product> resultProducts = productService.getProdctsByKeyword(requestParams);
         // Within a code block, if an assertion fails the
         // subsequent code in the same block will be skipped.
         assertAll("properties",
                 ()-> {
-                    assertNotNull(product);
-                    String name = product.getName();
+                    assertTrue(resultProducts.isPresent());
+                    String name = resultProducts.get().getName();
                     // Executed only if the previous assertion is valid.
                     assertAll("search product",
                             () -> assertTrue(name.equals("Prod1"))

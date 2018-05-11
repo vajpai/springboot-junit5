@@ -7,4 +7,9 @@ import lombok.Setter;
 public class Product {
     private String name;
     private String description;
+
+    public Product(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 }
