@@ -1,9 +1,15 @@
 package com.demo.service;
 
 
-import com.demo.bean.Product;
-import com.demo.bean.RequestParamsDef;
-import com.demo.dao.ProductDao;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,21 +18,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-
-import java.util.Optional;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import com.demo.bean.Product;
+import com.demo.bean.RequestParamsDef;
+import com.demo.dao.ProductDao;
 
 @ExtendWith(MockitoExtension.class)
-//For JUnit 5 tests you can silent this exception using annotation provided in mockito-junit-jupiter package.
-//@MockitoSettings(strictness = Strictness.LENIENT)
 class ProductServiceTest {
 
     @InjectMocks
@@ -38,31 +34,34 @@ class ProductServiceTest {
     @Test
     @DisplayName("Check Request Prams are empty or null")
     public void emptyOrNullCheckForProductRequestParams(){
-        Product product = mock(Product.class);
-        product.setName("iphone");
-        product.setDescription("iphone 10");
-
+        Product product = new Product("iphone","iphone 10");
         RequestParamsDef requestParams = new RequestParamsDef();
-        requestParams.setKeywords("Prod1");
+        requestParams.setKeywords("iphone");
+        List<Product> products = Arrays.asList(product);
+        when(productService.getProdctsByKeyword(requestParams)).thenReturn(products);
+        assertThat(productService.getProdctsByKeyword(requestParams).get(0).getName(), equalTo(product.getName()));
 
-        final Optional<Product> resultProducts = productService.getProdctsByKeyword(requestParams);
-       assertThat(productService.getProdctsByKeyword(requestParams),is(notNullValue()));
-       //assertThat(productService.getProdctsByKeyword(requestParams).get().getName(),is(equalToIgnoringWhiteSpace("iphone")));
     }
     @Test
     void getProductsByKeyword() {
         RequestParamsDef requestParams = new RequestParamsDef();
         requestParams.setKeywords("Prod1");
-        final Optional<Product> resultProducts = productService.getProdctsByKeyword(requestParams);
+        Product product = new Product("iphone","iphone 10");
+        List<Product> products = Arrays.asList(product);
+        when(productService.getProdctsByKeyword(requestParams)).thenReturn(products);
+        final List<Product> resultProducts = productService.getProdctsByKeyword(requestParams);
+        
+        assertThat(resultProducts.get(0).getName(),equalTo(products.get(0).getName()));
         // Within a code block, if an assertion fails the
         // subsequent code in the same block will be skipped.
-        assertAll("properties",
+      assertAll("properties",
                 ()-> {
-                    assertTrue(resultProducts.isPresent());
-                    String name = resultProducts.get().getName();
+                    assertNotNull(resultProducts);
+                    String name = resultProducts.get(0).getName();
+                    assertNotNull(name);
                     // Executed only if the previous assertion is valid.
                     assertAll("search product",
-                            () -> assertTrue(name.equals("Prod1"))
+                            () -> assertTrue(name.equals("iphone"))
                     );
                 });
 

@@ -16,17 +16,18 @@ public class ProductService {
     @Autowired
     private ProductDao productDao;
 
-    public Optional<Product> getProdctsByKeyword(RequestParamsDef requestParams) {
-        System.out.println("-----getProdctsByKeyword------");
+    public List<Product> getProdctsByKeyword(RequestParamsDef requestParams) {
+        List<Product> products = null;
         if(Optional.ofNullable(requestParams).isPresent() && !StringUtils.isEmpty(requestParams.getKeywords())){
             //returns the product which matches the keyword
-            Product product =   productDao.getProduct();
-            if(Optional.ofNullable(product).isPresent() && requestParams.getKeywords().equals(product.getName())){
-                return Optional.ofNullable(product);
+        	products =   productDao.getProducts();
+            if(Optional.ofNullable(products).isPresent()){
+                return products;
             }
         }
-        return Optional.empty();
+        return products;
     }
+
 
     public boolean isValid(RequestParamsDef requestParams){
         if(Optional.ofNullable(requestParams).isPresent() && !StringUtils.isEmpty(requestParams.getKeywords())){

@@ -1,19 +1,21 @@
 package com.demo.dao;
 
-import com.demo.bean.Product;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
+import com.demo.bean.Product;
 
 @Service
 public class ProductDao {
-    private Product product;
+	
+	List<Product> products = new ArrayList<Product>();
+   
+	public List<Product> getProducts(){
+		return products;
+	}
 
-    public Product getProduct() {
-        this.product = new Product("iphone","iphone 10");
-        return product;
-    }
+    
 
 }
